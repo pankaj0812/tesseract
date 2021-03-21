@@ -1,7 +1,9 @@
 import inspect
+
 from webob import Request, Response
 from parse import parse
-
+from requests import Session as RequestsSession
+from wsgiadapter import WSGIAdapter as RequestsWSGIAdapter
 
 class API:
     """
@@ -56,3 +58,11 @@ class API:
                 return handler, parse_result.named
         
         return None, None
+
+    """
+    Setting up a test client using WSGI Transport Adapter for Requests
+    """
+    def test_session(self, base_url="http://testserver"):
+        session = RequestsSession()
+        session.mount(prefix=base_url, adapter=RequestsWSGIAdapter(self))
+        return session

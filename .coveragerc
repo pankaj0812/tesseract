@@ -1,0 +1,2 @@
+[run]
+omit = venv/*,test_tesseract.py,conftest.py,app.py
