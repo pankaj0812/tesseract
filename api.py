@@ -1,4 +1,5 @@
 from webob import Request, Response
+from parse import parse
 
 class API:
     """
@@ -6,13 +7,42 @@ class API:
     __call__ called when creating instances of this class.
     """
 
+    def __init__(self):
+        """
+            Dictionary used to store paths as keys and handlers as values.
+        """
+        self.routes = {}
+
     def __call__(self, environ, start_response):
         request = Request(environ)
         response = self.handle_request(request)
         return response(environ, start_response)
+
+    def route(self, path):
+        def wrapper(handler):
+            self.routes[path] = handler
+            return handler
+        
+        return wrapper
     
     def handle_request(self, request):
-        user_agent = request.environ.get("HTTP_USER_AGENT", "No User Agent Found")
         response = Response()
-        response.text = f"Hello, my friend with this user agent:{user_agent}"
+
+        handler, kwargs = self.find_handler(request_path=request.path)
+        if handler is not None:
+            handler(request, response, **kwargs)
+        else:
+            self.default_response(response)
         return response
+
+    def default_response(self, response):
+        response.status_code = 404
+        response.text = "Not found."
+
+    def find_handler(self, request_path):
+        for path, handler in self.routes.items():
+            parse_result = parse(path, request_path)
+            if parse_result is not None:
+                return handler, parse_result.named
+        
+        return None, None
