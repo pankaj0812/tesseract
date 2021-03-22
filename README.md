@@ -17,7 +17,7 @@ pip install tesseract_pk
 
 ### Basic usage:
 ```python
-from tesseract_pk.api import API
+from tesseract.api import API
 
 app = API()
 
@@ -126,8 +126,8 @@ You can create custom middleware classes by inheriting from the `bumbo.middlewar
 that are called before and after each request:
 
 ```python
-from tesseract_pk.api import API
-from tesseract_pk.middleware import Middleware
+from tesseract.api import API
+from tesseract.middleware import Middleware
 
 
 app = API()
