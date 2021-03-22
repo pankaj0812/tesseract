@@ -8,7 +8,8 @@ from wsgiadapter import WSGIAdapter as RequestsWSGIAdapter
 from jinja2 import Environment, FileSystemLoader
 from whitenoise import WhiteNoise
 
-from middleware import Middleware
+from .middleware import Middleware
+from .response import Response
 
 class API:
     """
@@ -70,7 +71,7 @@ class API:
                 else:
                     if request.method.lower() not in allowed_methods:
                         raise AttributeError("Method not allowed", request.method)
-                    
+
                 handler(request, response, **kwargs)
             else:
                 self.default_response(response)
