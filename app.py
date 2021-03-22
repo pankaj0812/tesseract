@@ -35,7 +35,18 @@ class BooksResource:
         resp.text = "this is a post request"
 
     def put(self, req, resp):
-        resp.text = "Update request
+        resp.text = "Update request"
 
     def delete(self, req, resp):
         resp.text = "Delete request"
+
+def handler(req, resp):
+    resp.text = "sample"
+
+app.add_route("/sample", handler)
+
+@app.route("/template")
+def template_handler(req, resp):
+    resp.body = app.template(
+        "index.html", context={"name": "Tesseract", "title": "Minimal Web framework"}
+    ).encode()
