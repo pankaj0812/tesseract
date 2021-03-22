@@ -50,3 +50,7 @@ def template_handler(req, resp):
     resp.body = app.template(
         "index.html", context={"name": "Tesseract", "title": "Minimal Web framework"}
     ).encode()
+
+@app.route("/exception")
+def exception_throwing_handler(request, response):
+    raise AssertionError("This handler should not be used.")
