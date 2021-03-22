@@ -10,14 +10,14 @@ It's a WSGI framework and can be used with any WSGI application server such as G
 ## Installation
 
 ```shell
-pip install tesseract_pankaj
+pip install tesseract_pk
 ```
 
 ## How to use it
 
 ### Basic usage:
 ```python
-from tesseract_pankaj.api import API
+from tesseract_pk.api import API
 
 app = API()
 
@@ -126,8 +126,8 @@ You can create custom middleware classes by inheriting from the `bumbo.middlewar
 that are called before and after each request:
 
 ```python
-from tesseract_pankaj.api import API
-from tesseract_pankaj.middleware import Middleware
+from tesseract_pk.api import API
+from tesseract_pk.middleware import Middleware
 
 
 app = API()
