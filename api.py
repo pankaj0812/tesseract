@@ -33,7 +33,7 @@ class API:
         if path_info.startswith("/static"):
             environ["PATH_INFO"] = path_info[len("/static"):]
             return self.whitenoise(environ, start_response)
-            
+
         return self.middleware(environ, start_response)
 
     def wsgi_app(self, environ, start_response):
@@ -41,14 +41,15 @@ class API:
         response = self.handle_request(request)
         return response(environ, start_response)
 
-    def add_route(self, path, handler):
+    def add_route(self, path, handler, allowed_methods=None):
         assert path not in self.routes, "Such route already exists."
+        if allowed_methods is None:
+            allowed_methods = ["get", "post", "put", "delete", "patch", "options"]
+        self.routes[path] = {"handler": handler, "allowed_methods": allowed_methods}
 
-        self.routes[path] = handler
-
-    def route(self, path):
+    def route(self, path, allowed_methods=None):
         def wrapper(handler):
-            self.add_route(path, handler)
+            self.add_route(path, handler, allowed_methods)
             return handler
         
         return wrapper
@@ -56,15 +57,20 @@ class API:
     def handle_request(self, request):
         response = Response()
 
-        handler, kwargs = self.find_handler(request_path=request.path)
+        handler_data, kwargs = self.find_handler(request_path=request.path)
         
         try:
-            if handler is not None:
+            if handler_data is not None:
+                handler = handler_data["handler"]
+                allowed_methods = handler_data["allowed_methods"]
                 if inspect.isclass(handler):
                     handler = getattr(handler(), request.method.lower(), None)
                     if handler is None:
                         raise AttributeError("Method not allowed", request.method)
-                
+                else:
+                    if request.method.lower() not in allowed_methods:
+                        raise AttributeError("Method not allowed", request.method)
+                    
                 handler(request, response, **kwargs)
             else:
                 self.default_response(response)
@@ -80,10 +86,10 @@ class API:
         response.text = "Not found."
 
     def find_handler(self, request_path):
-        for path, handler in self.routes.items():
+        for path, handler_data in self.routes.items():
             parse_result = parse(path, request_path)
             if parse_result is not None:
-                return handler, parse_result.named
+                return handler_data, parse_result.named
         
         return None, None
 
