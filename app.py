@@ -1,5 +1,5 @@
-from api import API
-from middleware import Middleware
+from tesseract.api import API
+from tesseract.middleware import Middleware
 
 """
 Entrypoint for gunicorn
